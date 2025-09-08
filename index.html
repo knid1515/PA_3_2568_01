@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PA - ครูชำนาญการพิเศษ สุขศึกษาและพลศึกษา</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=Bai+Jamjuree:wght@700&display=swap');
+
+        :root {
+            --page-width: 550px;
+            --page-height: 700px;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #e9ebee;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* --- Loading Screen --- */
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 2000;
+            transition: opacity 0.5s ease-out;
+        }
+        .apple-logo {
+            width: 80px; height: 98px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 24" fill="white"><path d="M15.54,6.55c-1.11-1.23-2.65-2-4.23-2-1.84,0-3.58.98-4.63,2.5-1.42,2.08-2.62,5.2-1.2,7.9,1.08,2.05,2.94,3.58,5.15,3.58,1,0,2.05-.33,2.92-.98.85-.63,1.53-1.4,2.08-2.35-.48-.3-1-0.58-1.55-0.85-1.18-.58-2.5-.88-3.83-0.88-2.1,0-4.1,1.18,5.18,3.18-0.08.15-0.15.3-0.23.45,1.25,0.9,2.8,1.45,4.4,1.45,1.75,0,3.35-.6,4.63-1.7,1.05-.9,1.8-2.1,2.18-3.45-0.2-.1-0.4-.2-0.6-.3-2.1-1.1-3.2-3.4-3.2-5.45,0-1.6.6-3.1,1.6-4.1.08-0.08.15-0.15.23-0.23-1.63.1-3.25.9-4.2,2.3-.9,1.35-1.4,3-1.3,4.6.08,1.2.5,2.35,1.2,3.35.15.2.3.4.48.58.13-1.8.9-3.5,2.1-4.85C14.74,8.1,15.24,7.3,15.54,6.55Z M14.65,0.5C13.6,0.6,12.25,1.2,11.4,2.1c-0.85,0.9-1.5,2.3-1.4,3.7,0.1,1.3,0.8,2.5,1.6,3.3,0.9,0.8,2.1,1.2,3.3,1.2,0.2,0,0.4,0,0.6-0.05C16.5,9.4,17.55,8.8,18.3,7.9c0.9-1,1.5-2.4,1.4-3.8C19.6,2.1,18.3,0.5,16.5,0.5c-0.6,0-1.2.1-1.85.0Z"/></svg>');
+            background-size: contain; background-repeat: no-repeat; margin-bottom: 20px;
+        }
+        .progress-bar-container { width: 200px; height: 4px; background-color: #444; border-radius: 2px; overflow: hidden; }
+        .progress-bar { width: 0; height: 100%; background-color: white; border-radius: 2px; animation: loading-progress 2.5s ease-out forwards; }
+        @keyframes loading-progress { from { width: 0%; } to { width: 100%; } }
+        
+        /* --- Book Styles --- */
+        #main-content { display: none; }
+        .book-container {
+            width: var(--page-width);
+            height: var(--page-height);
+            position: relative;
+            perspective: 2500px;
+        }
+        .paper {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transform-origin: left center;
+            transition: transform 0.6s ease-in-out;
+            background-color: #fafafa;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backface-visibility: hidden;
+        }
+        .paper.flipped {
+            transform: rotateY(-180deg);
+        }
+        .page-content {
+            width: 100%;
+            height: 100%;
+            padding: 40px 50px 80px 50px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* --- Page Specific Backgrounds --- */
+        .cover-page {
+            background-image: url('https://via.placeholder.com/550x700/2c3e50/FFFFFF?text=Performance+Agreement+(PA)');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; justify-content: center; text-align: center;
+        }
+
+        .outer-back-cover {
+            background-image: url('https://via.placeholder.com/550x700/34495e/FFFFFF?text=School+Logo+Here');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* --- Language Toggle Styles --- */
+        .lang-en { display: none; }
+        body.lang-mode-en .lang-th { display: none; }
+        body.lang-mode-en .lang-en { display: inline; }
+        .page-top-controls { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 1002; }
+        .control-btn { background-color: rgba(0,0,0,0.1); border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2em; cursor: pointer; color: #333; display: flex; justify-content: center; align-items: center; transition: background-color 0.2s; }
+        .control-btn:hover { background-color: rgba(0,0,0,0.2); }
+        #lang-toggle-btn { font-family: 'Sarabun', sans-serif; font-weight: bold; color: white; background-color: rgba(44, 62, 80, 0.7); }
+        #lang-toggle-btn:hover { background-color: rgba(44, 62, 80, 1); }
+
+        /* --- Page Content Styles --- */
+        .cover-page h1 { font-size: 2.8em; margin: 0; }
+        .cover-page p { font-size: 1.2em; margin-top: 10px; text-indent: 0;}
+        h2 { font-family: 'Bai Jamjuree', sans-serif; font-size: 2em; color: #2c3e50; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px; margin-top: 0; }
+        h3 { font-family: 'Bai Jamjuree', sans-serif; font-size: 1.3em; color: #34495e; margin-top: 20px; }
+        p { line-height: 1.8; text-indent: 1.5em; text-align: justify; }
+        .toc-list { list-style: none; padding-left: 0; }
+        .toc-list li { font-size: 1.1em; margin-bottom: 15px; }
+        .toc-list a { text-decoration: none; color: #333; transition: color 0.2s; cursor: pointer; }
+        .toc-list a:hover { color: #2980b9; font-weight: bold; }
+        .toc-list .page-num { float: right; }
+        
+        .creator-page { text-align: center; }
+        .creator-page h2 { font-size: 2.2em; margin-bottom: 20px; }
+        .profile-pic { width: 150px; height: 150px; border-radius: 50%; background-color: #e0e0e0; margin: 0 auto 20px; border: 5px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; font-size: 1em; color: #757575; }
+        .creator-info { text-align: left; display: inline-block; font-size: 1.1em; line-height: 1.8; }
+        .creator-info p { text-indent: 0; margin: 8px 0; }
+
+        /* --- Navigation Buttons --- */
+        .nav-btn {
+            position: absolute; bottom: 20px; width: 50px; height: 50px;
+            background-color: rgba(44, 62, 80, 0.7); color: white; border: none;
+            border-radius: 50%; font-size: 1.5em; cursor: pointer; z-index: 1001;
+            display: flex; justify-content: center; align-items: center; padding: 0;
+            line-height: 1; transition: background-color 0.2s;
+        }
+        .nav-btn:hover { background-color: rgba(44, 62, 80, 1); }
+        #prev-btn { left: 20px; }
+        #next-btn { right: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="apple-logo"></div>
+        <div class="progress-bar-container"><div class="progress-bar"></div></div>
+    </div>
+
+    <div id="main-content">
+        <div class="book-container" id="book">
+            <button id="prev-btn" class="nav-btn">⬅️</button>
+            <button id="next-btn" class="nav-btn">➡️</button>
+
+            <div class="paper" id="p1">
+                <div class="page-content cover-page">
+                    <div class="page-top-controls" style="top:20px; right:20px;">
+                        <button id="lang-toggle-btn" class="control-btn" style="width:auto; padding: 0 12px; border-radius: 20px;">EN</button>
+                    </div>
+                    <h1><span class="lang-th">ข้อตกลงในการพัฒนางาน (PA)</span><span class="lang-en">Performance Agreement (PA)</span></h1>
+                    <p><span class="lang-th">สำหรับข้าราชการครูและบุคลากรทางการศึกษา<br>ตำแหน่งครู วิทยฐานะครูชำนาญการพิเศษ</span><span class="lang-en">For Teachers and Educational Personnel<br>Expert Teacher Level</span></p>
+                    <p style="margin-top: 40px;"><strong><span class="lang-th">กลุ่มสาระการเรียนรู้สุขศึกษาและพลศึกษา</span><span class="lang-en">Health and Physical Education Department</span></strong></p>
+                    <p><strong><span class="lang-th">ปีการศึกษา 2568</span><span class="lang-en">Academic Year 2025</span></strong></p>
+                </div>
+            </div>
+
+            <div class="paper" id="p2"><div class="page-content">
+                <div class="page-top-controls"><button class="control-btn speak-btn">🔊</button></div>
+                <h2><span class="lang-th">คำนำ</span><span class="lang-en">Preface</span></h2>
+                <p><span class="lang-th">เอกสารฉบับนี้จัดทำขึ้นเพื่อเสนอข้อตกลงในการพัฒนางาน (Performance Agreement: PA) สำหรับข้าราชการครูและบุคลากรทางการศึกษา ตำแหน่งครู วิทยฐานะครูชำนาญการพิเศษ ประจำปีงบประมาณ พ.ศ. 2568 ซึ่งได้สังเคราะห์และวิเคราะห์จากมาตรฐานตำแหน่งและภาระงานตามที่ ก.ค.ศ. กำหนด</span><span class="lang-en">This document presents the Performance Agreement (PA) for the fiscal year 2025, for the position of Expert Teacher. It has been synthesized and analyzed based on the position standards and workload requirements set by the Office of the Teacher Civil Service and Educational Personnel Commission (OTEPC).</span></p>
+                <p><span class="lang-th">โดยมุ่งเน้นการพัฒนารูปแบบการสอนเพื่อส่งเสริมทักษะการเคลื่อนไหวพื้นฐาน สำหรับนักเรียนชั้นประถมศึกษาปีที่ 3 ในรายวิชาสุขศึกษาและพลศึกษา เพื่อยกระดับผลสัมฤทธิ์ทางการเรียนรู้ของผู้เรียนให้สูงขึ้น และเป็นไปตามความคาดหวังของตำแหน่งและวิทยฐานะ</span><span class="lang-en">The focus is on developing an instructional model to enhance fundamental movement skills for Grade 3 students in Health and Physical Education. This aims to improve student learning outcomes and meet the expectations associated with the position and academic standing.</span></p>
+            </div></div>
+
+            <div class="paper" id="p3"><div class="page-content">
+                <div class="page-top-controls"><button class="control-btn speak-btn">🔊</button></div>
+                <h2><span class="lang-th">สารบัญ</span><span class="lang-en">Table of Contents</span></h2>
+                <ul class="toc-list">
+                    <li><a data-page="4"><span class="lang-th">บทที่ 1: บทนำ</span><span class="lang-en">Chapter 1: Introduction</span><span class="page-num">4</span></a></li>
+                    <li><a data-page="5"><span class="lang-th">บทที่ 2: เอกสารที่เกี่ยวข้อง</span><span class="lang-en">Chapter 2: Literature Review</span><span class="page-num">5</span></a></li>
+                    <li><a data-page="6"><span class="lang-th">บทที่ 3: วิธีดำเนินการวิจัย</span><span class="lang-en">Chapter 3: Methodology</span><span class="page-num">6</span></a></li>
+                    <li><a data-page="7"><span class="lang-th">บทที่ 4: ผลการวิเคราะห์ข้อมูล</span><span class="lang-en">Chapter 4: Results</span><span class="page-num">7</span></a></li>
+                    <li><a data-page="8"><span class="lang-th">บทที่ 5: สรุปและข้อเสนอแนะ</span><span class="lang-en">Chapter 5: Conclusion & Recs.</span><span class="page-num">8</span></a></li>
+                </ul>
+            </div></div>
+
+            <div class="paper" id="p4"><div class="page-content">
+                <div class="page-top-controls"><button class="control-btn speak-btn">🔊</button></div>
+                <h2><span class="lang-th">บทที่ 1: บทนำ</span><span class="lang-en">Chapter 1: Introduction</span></h2>
+                <h3><span class="lang-th">ความเป็นมาและความสำคัญ</span><span class="lang-en">Background and Significance</span></h3>
+                <p><span class="lang-th">ทักษะการเคลื่อนไหวพื้นฐานเป็นสิ่งสำคัญอย่างยิ่งสำหรับพัฒนาการของนักเรียนในระดับชั้นประถมศึกษาปีที่ 3 จากการจัดการเรียนการสอนที่ผ่านมา พบว่านักเรียนบางส่วนยังขาดความเข้าใจและปฏิบัติทักษะดังกล่าวได้ไม่ถูกต้อง จึงมีความจำเป็นต้องพัฒนานวัตกรรมการสอนเพื่อแก้ปัญหาดังกล่าว</span><span class="lang-en">Fundamental movement skills are crucial for the development of third-grade students. Previous instruction has revealed that some students lack understanding and proper execution of these skills. Therefore, it is necessary to develop an innovative teaching approach to address this issue.</span></p>
+                <h3><span class="lang-th">วัตถุประสงค์</span><span class="lang-en">Objectives</span></h3>
+                <p><span class="lang-th">1. เพื่อพัฒนาและหาประสิทธิภาพของชุดกิจกรรมการเรียนรู้ เรื่อง ทักษะการเคลื่อนไหวพื้นฐาน สำหรับนักเรียนชั้น ป.3<br>2. เพื่อเปรียบเทียบผลสัมฤทธิ์ทางการเรียนก่อนและหลังการใช้ชุดกิจกรรม</span><span class="lang-en">1. To develop and determine the effectiveness of a learning activity package on fundamental movement skills for Grade 3 students.<br>2. To compare students' learning achievements before and after using the activity package.</span></p>
+            </div></div>
+            
+            <div class="paper" id="p5"><div class="page-content">
+                <div class="page-top-controls"><button class="control-btn speak-btn">🔊</button></div>
+                <h2><span class="lang-th">บทที่ 2: เอกสารที่เกี่ยวข้อง</span><span class="lang-en">Chapter 2: Literature Review</span></h2>
+                <p><span class="lang-th">ในการศึกษาวิจัยครั้งนี้ ผู้จัดทำได้ศึกษาค้นคว้าเอกสารและงานวิจัยที่เกี่ยวข้องในประเด็นต่างๆ ดังนี้</span><span class="lang-en">For this research study, the creator has reviewed relevant literature and research on the following topics:</span></p>
+                <p><span class="lang-th">1. หลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน พุทธศักราช 2551 กลุ่มสาระการเรียนรู้สุขศึกษาและพลศึกษา<br>2. ทฤษฎีพัฒนาการทางสติปัญญาของเพียเจต์<br>3. แนวคิดเกี่ยวกับการเรียนรู้แบบ Active Learning<br>4. ทฤษฎีและหลักการเกี่ยวกับทักษะการเคลื่อนไหว<br>5. งานวิจัยที่เกี่ยวข้องกับการพัฒนาชุดกิจกรรมการเรียนรู้</span><span class="lang-en">1. The Basic Education Core Curriculum B.E. 2551 in Health and Physical Education.<br>2. Piaget's theory of cognitive development.<br>3. Concepts of Active Learning.<br>4. Theories and principles of motor skills.<br>5. Related research on the development of learning activity packages.</span></p>
+            </div></div>
+
+            <div class="paper" id="p6"><div class="page-content">
+                <div class="page-top-controls"><button class="control-btn speak-btn">🔊</button></div>
+                <h2><span class="lang-th">บทที่ 3: วิธีดำเนินการวิจัย</span><span class="lang-en">Chapter 3: Methodology</span></h2>
+                <h3><span class="lang-th">กลุ่มเป้าหมาย</span><span class="lang-en">Target Group</span></h3>
+                <p><span class="lang-th">นักเรียนชั้นประถมศึกษาปีที่ 3/1 โรงเรียน [ชื่อโรงเรียน] ภาคเรียนที่ 1 ปีการศึกษา 2568 จำนวน 30 คน</span><span class="lang-en">The target group consists of 30 students from Grade 3/1 at [School Name] during the first semester of the 2025 academic year.</span></p>
+                <h3><span class="lang-th">เครื่องมือที่ใช้</span><span class="lang-en">Research Instruments</span></h3>
+                <p><span class="lang-th">1. ชุดกิจกรรมการเรียนรู้ เรื่อง ทักษะการเคลื่อนไหวพื้นฐาน<br>2. แผนการจัดการเรียนรู้<br>3. แบบทดสอบวัดผลสัมฤทธิ์ทางการเรียน</span><span class="lang-en">1. A learning activity package on fundamental movement skills.<br>2. Lesson plans.<br>3. An achievement test.</span></p>
+                <h3><span class="lang-th">การวิเคราะห์ข้อมูล</span><span class="lang-en">Data Analysis</span></h3>
+                <p><span class="lang-th">วิเคราะห์ข้อมูลโดยใช้สถิติพื้นฐาน ได้แก่ ค่าเฉลี่ย (Mean) และส่วนเบี่ยงเบนมาตรฐาน (Standard Deviation)</span><span class="lang-en">Data were analyzed using descriptive statistics, including mean and standard deviation.</span></p>
+            </div></div>
+            
+            <div class="paper" id="p7"><div class="page-content">
+                <div class="page-top-controls"><button class="control-btn speak-btn">🔊</button></div>
+                <h2><span class="lang-th">บทที่ 4: ผลการวิเคราะห์ข้อมูล</span><span class="lang-en">Chapter 4: Results</span></h2>
+                <p><span class="lang-th">ผลการวิเคราะห์ประสิทธิภาพของชุดกิจกรรมการเรียนรู้ พบว่ามีประสิทธิภาพเท่ากับ 85.15/83.50 ซึ่งสูงกว่าเกณฑ์ 80/80 ที่ตั้งไว้</span><span class="lang-en">The analysis of the learning activity package's effectiveness revealed a score of 85.15/83.50, which is higher than the established criterion of 80/80.</span></p>
+                <p><span class="lang-th">ผลการเปรียบเทียบผลสัมฤทธิ์ทางการเรียน พบว่าคะแนนเฉลี่ยหลังเรียน (Mean = 25.05) สูงกว่าคะแนนเฉลี่ยก่อนเรียน (Mean = 14.50) อย่างมีนัยสำคัญทางสถิติ ซึ่งแสดงให้เห็นว่านักเรียนมีความก้าวหน้าในการเรียนรู้เพิ่มขึ้น</span><span class="lang-en">The comparison of learning achievement showed that the post-test mean score (25.05) was significantly higher than the pre-test mean score (14.50). This indicates that students made significant learning progress.</span></p>
+            </div></div>
+
+            <div class="paper" id="p8"><div class="page-content">
+                <div class="page-top-controls"><button class="control-btn speak-btn">🔊</button></div>
+                <h2><span class="lang-th">บทที่ 5: สรุปและข้อเสนอแนะ</span><span class="lang-en">Chapter 5: Conclusion</span></h2>
+                <h3><span class="lang-th">สรุปผลการวิจัย</span><span class="lang-en">Research Summary</span></h3>
+                <p><span class="lang-th">ชุดกิจกรรมการเรียนรู้ที่สร้างขึ้นมีประสิทธิภาพและสามารถพัฒนาทักษะการเคลื่อนไหวพื้นฐานของนักเรียนชั้น ป.3 ได้จริง ทำให้ผลสัมฤทธิ์ทางการเรียนของนักเรียนสูงขึ้น</span><span class="lang-en">The developed learning activity package is effective and can genuinely improve the fundamental movement skills of Grade 3 students, leading to higher academic achievement.</span></p>
+                 <h3><span class="lang-th">ข้อเสนอแนะ</span><span class="lang-en">Recommendations</span></h3>
+                <p><span class="lang-th">1. ควรมีการนำชุดกิจกรรมไปทดลองใช้กับนักเรียนในระดับชั้นอื่นๆ<br>2. ควรมีการพัฒนารูปแบบกิจกรรมให้มีความหลากหลายมากขึ้น เช่น การนำเทคโนโลยีเกมมาประยุกต์ใช้</span><span class="lang-en">1. The activity package should be tested with students in other grade levels.<br>2. The activities should be further diversified, for instance, by incorporating educational game technology.</span></p>
+            </div></div>
+            
+            <div class="paper" id="p9"><div class="page-content creator-page">
+                <div class="page-top-controls"><button class="control-btn speak-btn">🔊</button></div>
+                <h2><span class="lang-th">ผู้จัดทำ</span><span class="lang-en">Creator</span></h2>
+                <div class="profile-pic"><span class="lang-th">รูปภาพ</span><span class="lang-en">Image</span></div>
+                <div class="creator-info">
+                    <p><strong><span class="lang-th">ชื่อ-สกุล:</span><span class="lang-en">Name:</span></strong><span class="lang-th"> [ใส่ชื่อของคุณที่นี่]</span><span class="lang-en"> [Your Name Here]</span></p>
+                    <p><strong><span class="lang-th">ตำแหน่ง:</span><span class="lang-en">Position:</span></strong><span class="lang-th"> ครูชำนาญการพิเศษ</span><span class="lang-en"> Expert Teacher</span></p>
+                    <p><strong><span class="lang-th">กลุ่มสาระฯ:</span><span class="lang-en">Dept:</span></strong><span class="lang-th"> สุขศึกษาและพลศึกษา</span><span class="lang-en"> Health & Physical Education</span></p>
+                    <p><strong><span class="lang-th">โรงเรียน:</span><span class="lang-en">School:</span></strong><span class="lang-th"> [ใส่ชื่อโรงเรียนของคุณ]</span><span class="lang-en"> [Your School Name Here]</span></p>
+                    <p><strong><span class="lang-th">จัดทำเมื่อ:</span><span class="lang-en">Date:</span></strong><span class="lang-th"> กันยายน 2568</span><span class="lang-en"> September 2025</span></p>
+                </div>
+            </div></div>
+
+            <div class="paper" id="p10"><div class="page-content outer-back-cover"></div></div>
+
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainContent = document.getElementById('main-content');
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                }, 500);
+            }, 2500);
+        });
+
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const book = document.getElementById('book');
+        const papers = Array.from(book.querySelectorAll('.paper'));
+        const langToggleBtn = document.getElementById('lang-toggle-btn');
+        
+        const numOfPapers = papers.length;
+        let currentLocation = 0;
+        let isFlipping = false;
+        let currentLang = 'th';
+
+        nextBtn.addEventListener('click', goNextPage);
+        prevBtn.addEventListener('click', goPrevPage);
+        langToggleBtn.addEventListener('click', toggleLanguage);
+        
+        document.querySelectorAll('.toc-list a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (isFlipping) return;
+                const targetPage = parseInt(this.getAttribute('data-page'));
+                goToPage(targetPage - 1);
+            });
+        });
+
+        document.querySelectorAll('.speak-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const pageContent = this.closest('.page-content');
+                speakPageContent(pageContent);
+            });
+        });
+
+        updateButtons();
+        papers.forEach((paper, index) => {
+            paper.style.zIndex = numOfPapers - index;
+        });
+
+        function stopSpeech() {
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function goNextPage() {
+            if (isFlipping || currentLocation >= numOfPapers) return;
+            stopSpeech();
+            isFlipping = true;
+            papers[currentLocation].classList.add("flipped");
+            papers[currentLocation].style.zIndex = currentLocation + 1;
+            currentLocation++;
+            setTimeout(() => { isFlipping = false; }, 600);
+            updateButtons();
+        }
+
+        function goPrevPage() {
+            if (isFlipping || currentLocation <= 0) return;
+            stopSpeech();
+            isFlipping = true;
+            currentLocation--;
+            papers[currentLocation].classList.remove("flipped");
+            papers[currentLocation].style.zIndex = numOfPapers - currentLocation;
+            setTimeout(() => { isFlipping = false; }, 600);
+            updateButtons();
+        }
+        
+        function goToPage(targetIndex) {
+            if (currentLocation === targetIndex || isFlipping) return;
+            stopSpeech();
+            isFlipping = true;
+            
+            const sequence = () => {
+                if (currentLocation < targetIndex) {
+                    papers[currentLocation].classList.add("flipped");
+                    papers[currentLocation].style.zIndex = currentLocation + 1;
+                    currentLocation++;
+                    if (currentLocation < targetIndex) setTimeout(sequence, 200);
+                    else { isFlipping = false; updateButtons(); }
+                } else if (currentLocation > targetIndex) {
+                    currentLocation--;
+                    papers[currentLocation].classList.remove("flipped");
+                    papers[currentLocation].style.zIndex = numOfPapers - currentLocation;
+                    if (currentLocation > targetIndex) setTimeout(sequence, 200);
+                    else { isFlipping = false; updateButtons(); }
+                }
+            };
+            sequence();
+        }
+
+        function updateButtons() {
+            prevBtn.style.display = (currentLocation === 0) ? "none" : "block";
+            nextBtn.style.display = (currentLocation >= numOfPapers - 1) ? "none" : "block";
+        }
+
+        function toggleLanguage() {
+            stopSpeech();
+            if (currentLang === 'th') {
+                document.body.classList.add('lang-mode-en');
+                langToggleBtn.textContent = 'TH';
+                currentLang = 'en';
+            } else {
+                document.body.classList.remove('lang-mode-en');
+                langToggleBtn.textContent = 'EN';
+                currentLang = 'th';
+            }
+        }
+
+        function speakPageContent(pageElement) {
+            if (!window.speechSynthesis) {
+                alert("Sorry, your browser doesn't support text-to-speech.");
+                return;
+            }
+            stopSpeech();
+            
+            let textToSpeak = "";
+            const selector = `h2 .lang-${currentLang}, h3 .lang-${currentLang}, p .lang-${currentLang}, li .lang-${currentLang}`;
+            const elementsToRead = pageElement.querySelectorAll(selector);
+
+            elementsToRead.forEach(el => {
+                textToSpeak += el.textContent.trim() + ". ";
+            });
+            
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = currentLang === 'th' ? 'th-TH' : 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>
